@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>isPrime Number function</title>
+</head>
+<body>
+  <div>
+    <h1>isPrime()</h1>
+    <div id="input">
+      <input type="text" id="primeInput" value="281"> 
+      <button id="primeEval">Evaluate</button>
+    </div>
+    <div id="output"></div>
+  </div>
+</body>
+<script type="text/javascript" src="js/isPrime.js"></script>
+<script type="text/javascript">
+  (function(window, undefined) {
+    // A function to run our evaluation. It is invoked when the page is loaded.
+    function evaluatePrime() {
+      var input = Math.round(document.getElementById("primeInput").value);
+      if (input.isPrime()) {
+        document.getElementById("output").innerHTML = "The number is prime";
+      } else {
+        document.getElementById("output").innerHTML = "The number is <b>not</b> prime";
+      }
+    }
+
+    // Bind an onclick event to the button that runs the evaluation function
+    document.getElementById("primeEval").onclick = function() {
+      evaluatePrime();
+    };
+
+    // Run the function when the page is loaded.
+    evaluatePrime();
+  })(window);
+</script>
+</html>
