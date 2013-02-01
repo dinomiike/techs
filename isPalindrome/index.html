@@ -7,7 +7,7 @@
   <div>
     <h1>isPalindrome</h1>
     <div id="input">
-      <input type="text" id="palindromeInput" value="Bob"> 
+      <input type="text" id="palindromeInput" value="Cassius"> 
       <button id="palindromeEval">Evaluate</button>
     </div>
     <div id="output"></div>
@@ -16,6 +16,16 @@
 <script type="text/javascript" src="js/isPalindrome.js"></script>
 <script type="text/javascript">
   (function(window, undefined) {
-    document.getElementById("output").innerHTML = "Cassius";
+    document.getElementById("palindromeEval").onclick = function() {
+      var input = document.getElementById("palindromeInput").value;
+      var output;
+      if (input.length > 0) {
+        output = input.isPalindrome();
+        document.getElementById("output").innerHTML = output.toString();
+      } else {
+        output = "C'mon!";
+        document.getElementById("output").innerHTML = output;
+      }
+    };
   })(window);
 </script>

@@ -1,7 +1,5 @@
 // TODO:
-// Hook this up to the form
 // Strip punctuation marks from the string
-// Include (maybe by converting?) numbers
 
 (function(window, undefined) {
   if (!String.prototype.isPalindrome) {
