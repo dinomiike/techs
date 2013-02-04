@@ -12,7 +12,6 @@
             quotient = num / i;
             if (quotient.isPrime()) {
               // At this point, save prime and i as factors of the number
-              // TODO: May need to check for i.isPrime()
               return i+","+quotient; // end point
             } else {
               if (i.isPrime()) {
