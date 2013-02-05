@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>fibonacci sequence</title>
+</head>
+<body>
+  <div class="container">
+    <h1>fibonnaci sequence</h1>
+    <div>
+      <input type="text" id="fibInput" name="fibInput" value="3"> 
+      <button id="evalFib">Evaluate</button>
+    </div>
+    <div id="output"></div>
+  </div>
+</body>
+<script type="text/javascript" src="js/fibonacci.js"></script>
+<script type="text/javascript">
+  (function(window, undefined) {
+    document.getElementById("evalFib").onclick = function() {
+      var input = document.getElementById("fibInput").value;
+      var output = fib(input);
+      document.getElementById("output").innerHTML = output;
+    };
+  })(window);
+</script>
+</html>
