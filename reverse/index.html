@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>reverse</title>
+</head>
+<body>
+  <div class="container">
+    <h1>reverse (string)</h1>
+    <div>
+      <input type="text" id="reverseInput"> 
+      <button id="evalReverse">Evaluate</button>
+    </div>
+    <div id="output"></div>
+  </div>
+</body>
+<script type="text/javascript" src="js/reverse.js"></script>
+<script type="text/javascript">
+  (function(window, undefined) {
+    document.getElementById("evalReverse").onclick = function() {
+      var input = document.getElementById("reverseInput").value;
+      var output = input.reverse();
+      document.getElementById("output").innerHTML = output;
+    }
+  })(window);
+</script>
