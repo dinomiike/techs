@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Grouped Form Data</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Grouped Form Data</h1>
+    <!--<div id="yellow">Yellow:
+      <div>1st:  
+        Name <input type="text" class="yellow primary" data-rank="1" value="Ken"> 
+        Title <input type="text" class="yellow" data-rank="1" value="Designer">
+      </div>
+      <div>2nd:
+        Name <input type="text" class="yellow primary" data-rank="2" value="Johnathan"> 
+        Title <input type="text" class="yellow" data-rank="2" value="Developer">
+      </div>
+    </div>
+    <div id="blue">Blue:
+      <div>1st: 
+        Name <input type="text" class="blue primary" value="Sonic"> 
+        Title <input type="text" class="blue" value="Hedgehog">
+      </div>
+      <div>2nd: 
+        Name <input type="text" class="blue primary" value="Tails">
+        Title <input type="text" class="blue" value="Fox">
+      </div>
+    </div>
+    <div id="green">Green: 
+      <div>1st: 
+        Name <input type="text" class="green"> 
+        Title <input type="text" class="green">
+      </div>
+      <div>2nd: 
+        Name <input type="text" class="green">
+        Title <input type="text" class="green">
+      </div>
+    </div>
+    <div><button id="save">Save</button></div>-->
+    <div class="yellow"></div>
+    <div class="green"></div>
+    <div class="blue"></div>
+  </div>
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script type="text/javascript" src="js/groupForm.js"></script>
+<script type="text/javascript">
+  (function(window, undefined) {
+    $.getJSON("js/winners.json", function(Winners) {
+      var colorKey = "";
+      for (colorKey in Winners.colors) {
+        console.log(colorKey);
+        var container = $("."+colorKey);
+        for (var i = 0; i < Winners.colors[colorKey].length; i++) {
+          console.log(i + 1+": "+Winners.colors[colorKey][i].name);
+          console.log(Winners.colors[colorKey][i].loc);
+          console.log("");
+          container.append(
+            "<div class='rank'>"+
+            "<div class='flag"+(i + 1)+"'>"+(i + 1)+"</div>"+
+            "<div class='name'>"+Winners.colors[colorKey][i].name+"</div>"+
+            "<div class='loc'>"+Winners.colors[colorKey][i].loc+"</div>"+
+            "</div>"
+          );
+        }
+      }
+    });
+  })(window);
+</script>
+</html>

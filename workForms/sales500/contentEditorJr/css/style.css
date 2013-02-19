@@ -1,0 +1,101 @@
+input[type="text"] {
+  width: 153px;
+  margin-top: 3px;
+  padding: 3px;
+  border: 0;
+  font: bold 11.5px Helvetica, Arial, Verdana;
+}
+
+#logo {
+  height: 76px;
+}
+
+#set {
+  width: 323px;
+  margin-top: 3px;
+  margin-bottom: 25px;
+  padding: 5px;
+  font: bold 11px "Press Start 2P";
+  background: #ab1300;
+  color: #f0d0b0;
+  border: 0;
+  cursor: pointer;
+}
+
+#confirmation {
+  position: absolute;
+  top: 80px;
+  left: 275px;
+  width: 125px;
+  padding: 10px;
+  background: #0040ff;
+  font: bold 11px "Press Start 2P";
+  color: #fff;
+}
+
+.container {
+  position: relative;
+  width: 350px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heading {
+  float: left;
+  width: 210px;
+  padding: 10px 0 10px 0;
+  font: bold 28px "Press Start 2P";
+  text-align: right;
+  text-transform: uppercase;
+  color: #0040ff;
+  text-shadow: 2px 0px 0 aqua,
+               -2px 0px 0 aqua,
+               0px 2px 0 aqua,
+               0px -2px 0 aqua;
+}
+
+.side {
+  float: left;
+  width: 140px;
+  padding: 18px 0 0 0;
+  font: bold 45px "Press Start 2P";
+  text-transform: uppercase;
+  color: #f6e3ce;
+  text-shadow: 2px 0px 0 #0040ff,
+               -2px 0px 0 #0040ff,
+               0px 2px 0 #0040ff,
+               0px -2px 0 #0040ff,
+               -2px -2px 0 #0040ff,
+               2px -2px 0 #0040ff,
+               -2px 2px 0 #0040ff,
+               2px 2px 0 #0040ff;
+}
+
+.logoimg {
+  height: 140px;
+  background: lime;
+  background: url(../img/dkjr.gif);
+}
+
+.console {
+  clear: both;
+}
+
+.yellow {
+  background: #ffbf00;
+  color: #b43104;
+}
+
+.green {
+  background: #04b404;
+  color: #173b0b;
+}
+
+.blue {
+  background: #0080ff;
+  color: #08298a;
+}
+
+.hide {
+  display: none;
+}
