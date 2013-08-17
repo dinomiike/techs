@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+<head>
+  <title>d3 demo</title>
+  <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <style type="text/css">
+    #d3portfolio {
+      width: 320px;
+      height: 320px;
+    }
+    .chartLabel {
+      font: 16px sans-serif;
+      fill: #666;
+    }
+    .arcLabel {
+      font: 10px sans-serif;
+      fill: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="objectives">
+    <a href="#u18">Under 18</a> 
+    <a href="#o18">Over 18</a> 
+    <a href="#o30">Over 30</a> 
+    <a href="#o45">Over 45</a> 
+  </div>
+  <div id="d3portfolio"></div>
+
+
+    <script type="text/javascript">
+    var u18 = { label: 'Age', pct: [30, 15, 25, 30] };
+    var o18 = { label: 'over18', pct: [24,  7, 2, 18, 13, 36] };
+    var o30 = { label: 'over30', pct: [12,  4, 2, 10, 11, 61] };
+    var o45 = { label: 'over45', pct: [ 0,  0, 0,  0,  0,100] };
+
+    var data = u18;
+
+    // var labels = ['LCAP', 'MCAP', 'SCAP', 'Intl', 'Alt', 'Fixed'];
+
+    var w = 320; // width and height, natch
+    var h = 320;
+    var r = Math.min(w, h) / 2; // arc radius
+    var dur = 750; // duration, in milliseconds
+    var color = d3.scale.category10();
+    var donut = d3.layout.pie().sort(null);
+    var arc = d3.svg.arc().innerRadius(r - 70).outerRadius(r - 20);
+
+    // ---------------------------------------------------------------------
+    var svg = d3.select("#d3portfolio").append("svg:svg")
+      .attr("width", w).attr("height", h);
+
+    var defs = svg.append('svg:defs');
+
+    var u18pattern = defs.append("svg:pattern")
+      .attr('id', 'img0')
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 100)
+      .attr('height', 100);
+
+    var u18fill = u18pattern.append('svg:image')
+      .attr('xlink:href', 'u18.png')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 100)
+      .attr('height', 100);
+
+    var o18pattern = defs.append('svg:pattern')
+      .attr('id', 'img1')
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 100)
+      .attr('height', 100);
+
+    var o18fill = o18pattern.append('svg:image')
+      .attr('xlink:href', 'o18.png')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 100)
+      .attr('height', 100);
+
+    var o30pattern = defs.append('svg:pattern')
+      .attr('id', 'img2')
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 100)
+      .attr('height', 100);
+
+    var o30fill = o30pattern.append('svg:image')
+      .attr('xlink:href', 'o30.png')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 100)
+      .attr('height', 100);
+
+    var o45pattern = defs.append('svg:pattern')
+      .attr('id', 'img3')
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 100)
+      .attr('height', 100);
+
+    var o45fill = o45pattern.append('svg:image')
+      .attr('xlink:href', 'o45.png')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 100)
+      .attr('height', 100);
+
+    var arc_grp = svg.append("svg:g")
+      .attr("class", "arcGrp")
+      .attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
+
+    var label_group = svg.append("svg:g")
+        .attr("class", "lblGroup")
+        .attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
+
+    // GROUP FOR CENTER TEXT
+    var center_group = svg.append("svg:g")
+        .attr("class", "ctrGroup")
+        .attr("transform", "translate(" + (w / 2) + "," + (h / 2) + ")");
+
+    // CENTER LABEL
+    var pieLabel = center_group.append("svg:text")
+        .attr("dy", ".35em").attr("class", "chartLabel")
+        .attr("text-anchor", "middle")
+        .text(data.label);
+
+    // DRAW ARC PATHS
+    var arcs = arc_grp.selectAll("path")
+        .data(donut(data.pct));
+    arcs.enter().append("svg:path")
+        .attr("stroke", "white")
+        .attr("stroke-width", 0.5)
+        // .attr("fill", function(d, i) { console.log('d', d); console.log('i', i); console.log(color(i)); return color(i);})
+        .attr("d", arc)
+        .each(function(d) {this._current = d})
+        // .attr('fill', 'url(#img1)');
+        .attr('fill', function(d, i) { return 'url(#img' + i + ')'; });
+
+    // DRAW SLICE LABELS
+    // var sliceLabel = label_group.selectAll("text")
+    //     .data(donut(data.pct));
+    // sliceLabel.enter().append("svg:text")
+    //     .attr("class", "arcLabel")
+    //     .attr("transform", function(d) {return "translate(" + arc.centroid(d) + ")"; })
+    //     .attr("text-anchor", "middle");
+    //     .text(function(d, i) {return labels[i]; });
+
+    // --------- "PAY NO ATTENTION TO THE MAN BEHIND THE CURTAIN" ---------
+
+    // Store the currently-displayed angles in this._current.
+    // Then, interpolate from this._current to the new angles.
+    function arcTween(a) {
+        var i = d3.interpolate(this._current, a);
+        this._current = i(0);
+        return function(t) {
+            return arc(i(t));
+        };
+    }
+
+    // update chart
+    function updateChart(model) {
+        data = eval(model); // which model?
+
+        arcs.data(donut(data.pct)); // recompute angles, rebind data
+        arcs.transition().ease("elastic").duration(dur).attrTween("d", arcTween);
+
+        sliceLabel.data(donut(data.pct));
+        sliceLabel.transition().ease("elastic").duration(dur)
+            .attr("transform", function(d) {return "translate(" + arc.centroid(d) + ")"; })
+            .style("fill-opacity", function(d) {return d.value==0 ? 1e-6 : 1;});
+            
+        // pieLabel.text(data.label);
+    }
+
+    // click handler
+    $("#objectives a").click(function() {
+        updateChart(this.href.slice(this.href.indexOf('#') + 1));
+    });
+  </script>
+</body>
+</html>
