@@ -1,4 +1,5 @@
-var input = 15;
+var param = window.location.hash;
+var input = param.replace('#', '') || 15;
 var canvasWidth = 800;
 var canvasHeight = 800;
 var cities;
@@ -63,18 +64,6 @@ var plotRoads = function(cities) {
     allowBreak = false;
   }
 };
-
-// var connectRoadEdges = function(cities) {
-//   for (var i = 0; i < cities.length; i += 1) {
-//     var roads = cities[i].roads;
-//     if (roads.length > 1) {
-//       for (var j = 0; j < roads.length; j += 1) {
-//         // console.log(cities[i].city, cities[i].roads[j]);
-//         // graph.addEdge(cities[i].city, cities[i].roads[j][0], cities[i].roads[j][1]);
-//       }
-//     }
-//   }
-// };
 
 // 1. Generate cities
 cities = generateCities(input);
@@ -149,27 +138,27 @@ var handler = function() {
       }
     }
   }
-  console.log('highlightLine',highlightLine);
+  // console.log('highlightLine',highlightLine);
 
-  var highlightCanvas = document.getElementById('map-highlight');
-  var highlightCanvasWidth = highlightCanvas.width;
-  var highlightCanvasHeight = highlightCanvas.height;
-  var highlightContext = highlightCanvas.getContext('2d');
-  var previousX = highlightLine[from].x;
-  var previousY = highlightLine[from].y;
-  console.log('from point',highlightLine[from]);
-  highlightContext.beginPath();
-  highlightContext.moveTo(highlightLine[from].x, highlightLine[from].y);
+  // var highlightCanvas = document.getElementById('map-highlight');
+  // var highlightCanvasWidth = highlightCanvas.width;
+  // var highlightCanvasHeight = highlightCanvas.height;
+  // var highlightContext = highlightCanvas.getContext('2d');
+  // var previousX = highlightLine[from].x;
+  // var previousY = highlightLine[from].y;
+  // console.log('from point',highlightLine[from]);
+  // highlightContext.beginPath();
+  // highlightContext.moveTo(highlightLine[from].x, highlightLine[from].y);
   // Describe the path
   for (var i = 0; i < results.length; i += 1) {
-    highlightContext.beginPath();
-    highlightContext.moveTo(previousX, previousY);
-    highlightContext.lineTo(highlightLine[results[i]].x, highlightLine[results[i]].y);
-    highlightContext.strokeStyle = 'rgba(231,60,69,0.9)';
-    highlightContext.stroke();
+  //   highlightContext.beginPath();
+  //   highlightContext.moveTo(previousX, previousY);
+  //   highlightContext.lineTo(highlightLine[results[i]].x, highlightLine[results[i]].y);
+  //   highlightContext.strokeStyle = 'rgba(231,60,69,0.9)';
+  //   highlightContext.stroke();
     description += '<div>Move to ' + results[i] + '</div>';
   }
-  console.log(results);
+  // console.log(results);
   document.getElementById('plotDetails').innerHTML = description;
 
 };

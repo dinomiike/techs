@@ -1,7 +1,10 @@
-.map {
-  /*width: 800px;
-  height: 800px;*/
-  /*background: indianred;*/
+body {
+  font: 11px 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', 'Helvetica Neue', Helvetica, sans-serif;
+  background: #f5f5f5;
+}
+
+h1 {
+  letter-spacing: -1px;
 }
 
 .controls {
