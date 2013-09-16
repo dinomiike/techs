@@ -3,6 +3,7 @@ var canvasWidth = 800;
 var canvasHeight = 800;
 var cities;
 var graph = {};
+var selectOutput = '';
 
 var save = '[{"city":8,"x":134,"y":123,"fromOrigin":181.89282558693733},{"city":7,"x":118,"y":430,"fromOrigin":445.896849058165},{"city":4,"x":45,"y":494,"fromOrigin":496.0453608290274},{"city":3,"x":500,"y":64,"fromOrigin":504.0793588315237},{"city":2,"x":452,"y":240,"fromOrigin":511.7655713312493},{"city":9,"x":615,"y":177,"fromOrigin":639.9640614909559},{"city":5,"x":240,"y":636,"fromOrigin":679.7764338368902},{"city":0,"x":127,"y":745,"fromOrigin":755.7473122677976},{"city":6,"x":760,"y":238,"fromOrigin":796.3943746662203},{"city":1,"x":648,"y":508,"fromOrigin":823.3881223335687}]';
 
@@ -15,6 +16,7 @@ var generateCities = function(input) {
     city.y = Math.floor(Math.random() * canvasHeight) + 1;
     city.fromOrigin = Math.sqrt(Math.pow((city.x - 0), 2) + Math.pow((city.y - 0),2));
     list.push(city);
+    selectOutput += '<option id="' + city.city + '">' + city.city + '</option>';
   }
   return list;
 };
@@ -62,17 +64,17 @@ var plotRoads = function(cities) {
   }
 };
 
-var connectRoadEdges = function(cities) {
-  for (var i = 0; i < cities.length; i += 1) {
-    var roads = cities[i].roads;
-    if (roads.length > 1) {
-      for (var j = 0; j < roads.length; j += 1) {
-        // console.log(cities[i].city, cities[i].roads[j]);
-        // graph.addEdge(cities[i].city, cities[i].roads[j][0], cities[i].roads[j][1]);
-      }
-    }
-  }
-};
+// var connectRoadEdges = function(cities) {
+//   for (var i = 0; i < cities.length; i += 1) {
+//     var roads = cities[i].roads;
+//     if (roads.length > 1) {
+//       for (var j = 0; j < roads.length; j += 1) {
+//         // console.log(cities[i].city, cities[i].roads[j]);
+//         // graph.addEdge(cities[i].city, cities[i].roads[j][0], cities[i].roads[j][1]);
+//       }
+//     }
+//   }
+// };
 
 // 1. Generate cities
 cities = generateCities(input);
@@ -117,6 +119,56 @@ for (var i = 0; i < cities.length; i += 1) {
     context.fillText(Math.floor(roads[j][1]), (roads[j][2] + cities[i].x) / 2, (roads[j][3] + cities[i].y) / 2);
   }
 }
+
+// 5. Populate the select options on the page with the pre-rendered output
+document.getElementById('from').innerHTML = selectOutput;
+document.getElementById('to').innerHTML = selectOutput;
+
+// 6. HTML Event binding on the plot button
+var handler = function() {
+  var from = document.getElementById('from').selectedIndex;
+  var to = document.getElementById('to').selectedIndex;
+  var results = dijkstra.find_path(graph, from, to);
+
+  console.log(results);
+
+  var description = '<div>Starting from point ' + from + '</div>';
+
+  // // Clear out the output box
+  document.getElementById('plotDetails').innerHTML = '';
+
+  // // Describe the path
+  debugger;
+  for (var i = 0; i < results.length; i += 1) {
+    description += '<div>Move to ' + results[i] + '</div>';
+  }
+  console.log(results);
+  document.getElementById('plotDetails').innerHTML = description;
+};
+
+var el = document.getElementById('find');
+el.addEventListener('click', handler, false);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

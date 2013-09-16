@@ -3,3 +3,23 @@
   height: 800px;*/
   /*background: indianred;*/
 }
+
+.controls {
+  height: 500px;
+}
+
+.container {
+  position: relative;
+}
+
+.canvas-container {
+  position: relative;
+  width: 800px;
+  height: 850px;
+}
+
+#map-canvas, #map-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
