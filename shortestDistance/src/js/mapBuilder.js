@@ -1,7 +1,8 @@
-var input = 200;
+var input = 15;
 var canvasWidth = 800;
 var canvasHeight = 800;
 var cities;
+var graph = {};
 
 var save = '[{"city":8,"x":134,"y":123,"fromOrigin":181.89282558693733},{"city":7,"x":118,"y":430,"fromOrigin":445.896849058165},{"city":4,"x":45,"y":494,"fromOrigin":496.0453608290274},{"city":3,"x":500,"y":64,"fromOrigin":504.0793588315237},{"city":2,"x":452,"y":240,"fromOrigin":511.7655713312493},{"city":9,"x":615,"y":177,"fromOrigin":639.9640614909559},{"city":5,"x":240,"y":636,"fromOrigin":679.7764338368902},{"city":0,"x":127,"y":745,"fromOrigin":755.7473122677976},{"city":6,"x":760,"y":238,"fromOrigin":796.3943746662203},{"city":1,"x":648,"y":508,"fromOrigin":823.3881223335687}]';
 
@@ -26,6 +27,7 @@ var plotRoads = function(cities) {
 
   for (var city in cities) {
     // debugger;
+    graph[cities[city].city] = {};
     for (var connectingCity in cities) {
       // Ensure we're not comparing the same city
       if (cities[city].city !== cities[connectingCity].city) {
@@ -42,8 +44,9 @@ var plotRoads = function(cities) {
           );
           // If the actual distance is within 340 then add it
           if (distance <= 340) {
-            // console.log('connecting to city...',cities[connectingCity].city, distance);
-            connectRoad(cities[city], [cities[connectingCity].city, distance]);
+            // Comparative option for testing
+            connectRoad(cities[city], [cities[connectingCity].city, distance, cities[connectingCity].x, cities[connectingCity].y]);
+            graph[cities[city].city][cities[connectingCity].city] = distance;
           }
         } else {
           // Only allow the flow to break out of the loop after you have passed this city in the array
@@ -59,11 +62,21 @@ var plotRoads = function(cities) {
   }
 };
 
-
+var connectRoadEdges = function(cities) {
+  for (var i = 0; i < cities.length; i += 1) {
+    var roads = cities[i].roads;
+    if (roads.length > 1) {
+      for (var j = 0; j < roads.length; j += 1) {
+        // console.log(cities[i].city, cities[i].roads[j]);
+        // graph.addEdge(cities[i].city, cities[i].roads[j][0], cities[i].roads[j][1]);
+      }
+    }
+  }
+};
 
 // 1. Generate cities
-// cities = generateCities(input);
-cities = JSON.parse(save);
+cities = generateCities(input);
+// cities = JSON.parse(save);
 
 // 2. Sort the cities array of objects by their distance from the origin
 cities.sort(function(a, b) {
@@ -77,13 +90,33 @@ cities.sort(function(a, b) {
 // 3. Plot roads (based on distance). This mutates the city objects embedded in cities
 plotRoads(cities);
 // console.log(cities);
+// console.log(graph);
 
-// 4. Build a graph based on the cities
-var graph = new DirectedGraph();
-graph.addNodesFromArray(cities);
-
-// 5. Loop through all the roads in each city to draw edges
-
+// 4. Draw the graph using canvas
+var canvas = document.getElementById('map-canvas');
+var canvasWidth = canvas.width;
+var canvasHeight = canvas.height;
+var context = canvas.getContext('2d');
+context.strokeStyle = 'rgba(0,0,0,0.3)';
+for (var i = 0; i < cities.length; i += 1) {
+  // Draw the square for the city
+  context.fillRect(cities[i].x, cities[i].y, 10, 10);
+  // Draw a label for city number to identify them
+  context.font = '20px Helvetica';
+  context.fillText(cities[i].city, cities[i].x, cities[i].y - 5)
+  // Draw a line to connect all the roads
+  var roads = cities[i].roads;
+  // TODO: There's an error where limiting the amount of data points can lead to no roads and canvas breaks
+  // The better fix would be to increase the radius for connecting roads
+  for (var j = 0; j < roads.length; j += 1) {
+    context.beginPath();
+    context.moveTo(cities[i].x, cities[i].y);
+    context.lineTo(roads[j][2], roads[j][3]);
+    context.stroke();
+    context.font = '12px Helvetica';
+    context.fillText(Math.floor(roads[j][1]), (roads[j][2] + cities[i].x) / 2, (roads[j][3] + cities[i].y) / 2);
+  }
+}
 
 
 
