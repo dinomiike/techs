@@ -126,24 +126,52 @@ document.getElementById('to').innerHTML = selectOutput;
 
 // 6. HTML Event binding on the plot button
 var handler = function() {
-  var from = document.getElementById('from').selectedIndex;
+  var from = document.getElementById('from').selectedIndex || 0;
   var to = document.getElementById('to').selectedIndex;
   var results = dijkstra.find_path(graph, from, to);
-
-  console.log(results);
+  var highlightLine = [];
 
   var description = '<div>Starting from point ' + from + '</div>';
 
-  // // Clear out the output box
+  // Clear out the output box
   document.getElementById('plotDetails').innerHTML = '';
 
-  // // Describe the path
-  debugger;
+  // Draw the highlight line by building a new object of the plot points
+  // Need to grab the x,y coordinates of each point by looping through the cities array of objects
+  for (var j = 0; j < cities.length; j += 1) {
+    var city = cities[j].city;
+    // Loop through the results array ensures we only do this gleaning once
+    for (var k = 0; k < results.length; k += 1) {
+      if (city === parseInt(results[k]) && from === parseInt(results[k])) {
+        highlightLine[city] = {};
+        highlightLine[city].x = cities[j].x;
+        highlightLine[city].y = cities[j].y;
+      }
+    }
+  }
+  console.log('highlightLine',highlightLine);
+
+  var highlightCanvas = document.getElementById('map-highlight');
+  var highlightCanvasWidth = highlightCanvas.width;
+  var highlightCanvasHeight = highlightCanvas.height;
+  var highlightContext = highlightCanvas.getContext('2d');
+  var previousX = highlightLine[from].x;
+  var previousY = highlightLine[from].y;
+  console.log('from point',highlightLine[from]);
+  highlightContext.beginPath();
+  highlightContext.moveTo(highlightLine[from].x, highlightLine[from].y);
+  // Describe the path
   for (var i = 0; i < results.length; i += 1) {
+    highlightContext.beginPath();
+    highlightContext.moveTo(previousX, previousY);
+    highlightContext.lineTo(highlightLine[results[i]].x, highlightLine[results[i]].y);
+    highlightContext.strokeStyle = 'rgba(231,60,69,0.9)';
+    highlightContext.stroke();
     description += '<div>Move to ' + results[i] + '</div>';
   }
   console.log(results);
   document.getElementById('plotDetails').innerHTML = description;
+
 };
 
 var el = document.getElementById('find');
