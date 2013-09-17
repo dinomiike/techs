@@ -8,6 +8,95 @@ var selectOutput = '';
 
 var save = '[{"city":8,"x":134,"y":123,"fromOrigin":181.89282558693733},{"city":7,"x":118,"y":430,"fromOrigin":445.896849058165},{"city":4,"x":45,"y":494,"fromOrigin":496.0453608290274},{"city":3,"x":500,"y":64,"fromOrigin":504.0793588315237},{"city":2,"x":452,"y":240,"fromOrigin":511.7655713312493},{"city":9,"x":615,"y":177,"fromOrigin":639.9640614909559},{"city":5,"x":240,"y":636,"fromOrigin":679.7764338368902},{"city":0,"x":127,"y":745,"fromOrigin":755.7473122677976},{"city":6,"x":760,"y":238,"fromOrigin":796.3943746662203},{"city":1,"x":648,"y":508,"fromOrigin":823.3881223335687}]';
 
+var Dijkstra = function() {
+  this.nodes = {};
+  this.startNode = {};
+  this.endNode = {};
+  this.currentNode = {};
+  this.order = 1;
+  this.shortest = {};
+
+  this.plot = function(start, end) {
+    // Set preliminary nodes
+    this.startNode = start;
+    this.endNode = end;
+    this.currentNode = start;
+    // Set up the start node as a permanent node, 0 distance away from itself
+    this.addNode(start.city, this.order, 0);
+    this.findPath();
+  };
+
+  this.addNode = function(city, order, distance, working) {
+    typeof(order) !== 'undefined' ? order = order : order = null;
+    typeof(distance) !== 'undefined' ? distance = distance : distance = null;
+    typeof(working) !== 'undefined' ? working = working : working = null;
+    this.nodes[city] = {
+      order: order,
+      distance: distance,
+      working: working
+    };
+  };
+
+  this.findPath = function() {
+    var city, distance;
+    var roads = this.currentNode.roads;
+    
+    // Base case:
+    if (this.currentNode === this.endNode) {
+      // 6. Trace your path back to the start node by subtracting distances
+      console.log('reached the end, begin tracing backwards');
+    } else {
+      // 1. Create nodes for each road connecting to a city and assing temporary, working values
+      for (var i = 0; i < roads.length; i += 1) {
+        city = roads[i][0];
+        distance = roads[i][1];
+        // Assign working labels to each dijkstra city node
+        if (this.nodes[city]) {
+          this.nodes[city].working += distance;
+        } else {
+          // There was no node for this city so we create it and assign it the distance
+          this.addNode(city, null, null, distance);
+        }
+      }
+      
+      // 2. Loop all the dijkstra nodes that don't have permanent labels to find the one with the shortest distance
+      for (var key in this.nodes) {
+        // Only check nodes that don't have an order property (aka temporary labels)
+        if (!this.nodes[key].order) {
+          if (this.shortest.distance) {
+            if (this.nodes[key].working < this.shortest.distance) {
+              this.shortest.distance = this.nodes[key].distance;
+              this.shortest.city = key;
+            }
+          } else {
+            this.shortest.distance = this.nodes[key].working;
+            this.shortest.city = key
+          }
+        }
+      }
+
+      // 3. Assign a permanent label of distance to the node with the shortest distance
+      this.nodes[this.shortest.city].order = this.order += 1;
+
+      // 4. Move to the new node (assign it to the current) and wipe away the values in shortest
+      // TODO: Unfortunately this requires a loop through the cities array (again) because the data it's saved in is an array. A hash table might serve better
+      for (var i = 0; i < cities.length; i += 1) {
+        if (parseInt(this.shortest.city) === cities[i].city) {
+          this.currentNode = cities[i];
+          break;
+        }
+      }
+      // Wipe shortest object
+      this.shortest = {};
+
+      // 5. Call findPath again. The new parameters have all been set -- see base case above for how the function should end
+      debugger;
+      this.findPath();
+    }
+  };
+
+};
+
 var generateCities = function(input) {
   var list = [];
   for (var i = 0; i < input; i += 1) {
@@ -66,8 +155,8 @@ var plotRoads = function(cities) {
 };
 
 // 1. Generate cities
-cities = generateCities(input);
-// cities = JSON.parse(save);
+// cities = generateCities(input);
+cities = JSON.parse(save);
 
 // 2. Sort the cities array of objects by their distance from the origin
 cities.sort(function(a, b) {
@@ -91,7 +180,7 @@ var context = canvas.getContext('2d');
 context.strokeStyle = 'rgba(0,0,0,0.3)';
 for (var i = 0; i < cities.length; i += 1) {
   // Draw the square for the city
-  context.fillRect(cities[i].x, cities[i].y, 10, 10);
+  context.fillRect(cities[i].x - 5, cities[i].y - 5, 10, 10);
   // Draw a label for city number to identify them
   context.font = '20px Helvetica';
   context.fillText(cities[i].city, cities[i].x, cities[i].y - 5)
@@ -170,7 +259,10 @@ el.addEventListener('click', handler, false);
 
 
 
-
+var dj = new Dijkstra();
+var start = cities[0];
+var end = cities[1];
+dj.plot(start, end);
 
 
 
