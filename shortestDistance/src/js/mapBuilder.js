@@ -17,6 +17,7 @@ var Dijkstra = function() {
   this.currentNode = {};
   this.order = 1;
   this.shortest = {};
+  this.path = [];
 
   this.plot = function(start, end) {
     // Set preliminary nodes
@@ -26,6 +27,7 @@ var Dijkstra = function() {
     // Set up the start node as a permanent node, 0 distance away from itself
     this.addNode(start.city, this.order, 0);
     this.findPath();
+    this.finished = false;
   };
 
   this.addNode = function(city, order, distance, working) {
@@ -39,6 +41,41 @@ var Dijkstra = function() {
     };
   };
 
+  this.traceBack = function() {
+    var roads = this.currentNode.roads;
+    // Base case:
+    if (this.currentNode === this.startNode) {
+      this.path = this.path.reverse();
+      this.finished = true;
+    } else {
+      // 7. Loop through all the roads connected to the end point
+      for (var i = 0; i < roads.length; i += 1) {
+        if (!this.finished) {
+          // 8. Find the road we took to get here: 
+          // Is the total distance at the current node less the distance of the target city equal to the working distance of that city. If this is true, we came this way
+          var targetCityWorkingValue = (this.nodes[roads[i][0]].working) ? parseFloat(this.nodes[roads[i][0]].working.toFixed(8)) : 0;
+          var distanceToTargetCity = this.nodes[this.currentNode.city].distance - roads[i][1];
+          if (distanceToTargetCity !== 0) {
+            distanceToTargetCity = parseFloat(distanceToTargetCity.toFixed(8));
+          }
+          if (targetCityWorkingValue === distanceToTargetCity) {
+            // Found the right path back. Save it to the storage
+            this.path.push(roads[i][0]);
+            // 9. Move to this city
+            for (var j = 0; j < cities.length; j += 1) {
+              if (parseInt(roads[i][0]) === cities[j].city) {
+                this.currentNode = cities[j];
+                break;
+              }
+            }
+            // 10. Recurse
+            this.traceBack();
+          }
+        }
+      }
+    }
+  };
+
   this.findPath = function() {
     var city, distance, check;
     var roads = this.currentNode.roads;
@@ -46,10 +83,11 @@ var Dijkstra = function() {
     // Base case:
     if (this.currentNode === this.endNode) {
       // 6. Trace your path back to the start node by subtracting distances
-      console.log('reached the end, begin tracing backwards');
+      this.path.push(this.currentNode.city);
+      this.traceBack();
     } else {
 
-      debugger;
+      // debugger;
       // 1. Create nodes for each road connecting to a city and assign temporary, working values. Only consider roads that haven't been given permanent labels.
       for (var i = 0; i < roads.length; i += 1) {
         city = roads[i][0];
@@ -103,7 +141,6 @@ var Dijkstra = function() {
       this.shortest = {};
 
       // 5. Call findPath again. The new parameters have all been set -- see base case above for how the function should end
-      // debugger;
       this.findPath();
     }
   };
@@ -219,7 +256,6 @@ var handler = function() {
   var from = document.getElementById('from').selectedIndex || 0;
   var to = document.getElementById('to').selectedIndex;
   var results = dijkstra.find_path(graph, from, to);
-  console.log('dijkstra results', results);
   var highlightLine = [];
 
   var description = '';//'<div>Starting from point ' + from + '</div>';
