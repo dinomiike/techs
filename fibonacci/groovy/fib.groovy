@@ -1,5 +1,6 @@
 /*
  * Print a number (n) of fibonacci numbers in a list
+ * To run from the command line, type: groovy fib.groovy 5
  */
 
 def fib(n) {
