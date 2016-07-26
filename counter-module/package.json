@@ -1,0 +1,12 @@
+{
+  "name": "counter-module",
+  "version": "0.0.1",
+  "author": "Miike Ramos",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dinomiike/techs/counter-module"
+  },
+  "homepage": "https://secretdino.com/counter"
+}
