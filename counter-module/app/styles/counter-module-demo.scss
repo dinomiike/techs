@@ -1,0 +1,91 @@
+$font-stack: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$brand-gray: #f9f9f9;
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  font-family: $font-stack;
+  background: -webkit-linear-gradient(-45deg, #c5d4d7 6%, #d6b98d 34%, #c99262 57%, #8c5962 80%, #43577e 100%);
+}
+
+h1 {
+  display: none;
+  text-align: center;
+  margin: 10px;
+  line-height: 60px;
+  font-weight: 200;
+  font-size: 48px;
+  //color: #4d4d4d;
+  color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  h1 {
+    display: block;
+  }
+}
+
+p {
+  display: none;
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: 200;
+}
+
+@media (min-width: 768px) {
+  p {
+    display: block;
+  }
+}
+
+.clearfix {
+  *zoom: 1;
+  width: 100%;
+  margin: 0 auto;
+  background-size: cover;
+
+  &:before,
+  &:after {
+    display: table;
+    content: "";
+    line-height: 0;
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+@media (min-width: 768px) {
+  .clearfix {
+    width: 1140px;
+  }
+}
+
+.row {
+  width: 66.66666667%;
+  margin: 0 auto;
+}
+
+.demo-buttons {
+  margin-top: 100px;
+  text-align: center;
+
+  button {
+    background: none;
+    border: 1px solid #fff;
+    font: $font-stack;
+    font-size: 13px;
+    font-weight: 200;
+    color: #fff;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}

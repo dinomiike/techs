@@ -1,32 +1,37 @@
 (function() {
   'use strict';
 
-  var root = this;
+  const root = this;
 
-  var CounterModule = function(doc, undefined) {
-    var counter;
-    var elementContainer;
-    var digitsOld = [];
-    var digitsNew = [];
-    var decimalsOld = [];
-    var decimalsNew = [];
-    var digitsAnimate = [];
-    var x;
-    var y;
-    var lastTimeout;
-    var nextCount = null;
-    var htmlElement = doc.getElementsByTagName('html')[0];
-    var cssAnimationSupport = htmlElement.className.indexOf('no-csstransforms3d') < 0;
+  let counterModule = function(doc) {
+    let counter;
+    let elementContainer;
+    let digitsOld = [];
+    let digitsNew = [];
+    let decimalsOld = [];
+    let decimalsNew = [];
+    let digitsAnimate = [];
+    let x;
+    let y;
+    let lastTimeout;
+    let nextCount = null;
+    const htmlElement = doc.getElementsByTagName('html')[0];
+    const cssAnimationSupport = htmlElement.className.indexOf('no-csstransforms3d') < 0;
 
-    var defaults = {
+    let defaults = {
       value: 0,
       inc: 1,
-      // pace: 1000,
+      pace: 1000,
       auto: true,
       decimals: 0,
       places: 0
     };
 
+    /**
+     * Calls the function that will do the work of animation, using the defined easing method
+     *
+     * @return {int} The setTimeout call returns an integer of the timeout id.
+     */
     function animateValue() {
       // stop counter
       if (counter.value === counter.stop) {
@@ -36,21 +41,36 @@
       var range = counter.stop - counter.value;
       var current = counter.value;
       var duration = counter.duration;
-      // var increment = counter.stop > counter.value ? 1 : -1;
-      // var startTime = new Date();
+      var easingLookup = {
+        linear: _linear,
+        constant: _constant,
+        quadratic: _quadratic
+      };
+      var interval = counter.hasOwnProperty('easing') ? easingLookup[counter.easing] : counter.pace;
 
-      return setTimeout(_doCount, _constant(duration, range, current));
+      return setTimeout(_doCount, typeof interval === 'function' ? interval(duration, range, current) : interval);
+      // return setTimeout(_doCount, _quadratic(duration, range, current));
+      // return setTimeout(_doCount, 2000);
     }
 
+    /**
+     * Initialize the counter. This starts the counter running and dictates which version of it should be displayed
+     *
+     * @param {string} elementContainerId
+     *   The DOM ID of the element containing the counter
+     * @param {object} options
+     *   A map of options for initialization of this counter instance
+     */
     function init(elementContainerId, options) {
       counter = options || {};
 
-      var option;
-      for (option in defaults) {
-        counter[option] = counter.hasOwnProperty(option) ? counter[option] : defaults[option];
+      for (var option in defaults) {
+        if (defaults.hasOwnProperty(option)) {
+          counter[option] = counter.hasOwnProperty(option) ? counter[option] : defaults[option];
+        }
       }
 
-      if (typeof(elementContainerId) === 'string') {
+      if (typeof elementContainerId === 'string') {
         elementContainer = doc.getElementById(elementContainerId);
       }
 
@@ -74,6 +94,8 @@
      *
      * @param {int} n
      *   New counter value
+     *
+     * @return {object} instance of the counter
      */
     function setValue(n) {
       if (_isNumber(n)) {
@@ -81,11 +103,17 @@
         y = counter.value = n;
         _digitCheck(x, y);
       }
+
       return this;
     }
 
     /**
      * Sets the increment for the counter. Does NOT animate digits.
+     *
+     * @param {int} n
+     *   the number the increment should be set to
+     *
+     * @return {object} instance of the counter
      */
     function setIncrement(n) {
       counter.inc = _isNumber(n) ? n : defaults.inc;
@@ -97,6 +125,8 @@
      *
      * @param {int} n
      *   New pace for counter in milliseconds
+     *
+     * @return {object} instance of the counter
      */
     function setPace(n) {
       counter.pace = _isNumber(n) ? n : defaults.pace;
@@ -108,25 +138,31 @@
      *
      * @param {boolean} a
      *   Should counter auto-increment, true or false
+     *
+     * @return {object} instance of the counter
      */
     function setAuto(a) {
-      var sa = typeof(a) !== 'boolean' ? true : a;
+      // TOOD: verify this doesn't break anything
+      // var setAutoIncrement = typeof a !== 'boolean' ? true : a;
+      var setAutoIncrement = typeof a === 'boolean' ? a : true;
       if (counter.auto) {
-        if (!sa) {
+        if (!setAutoIncrement) {
           if (nextCount) {
             _clearNext();
           }
           counter.auto = false;
         }
       } else {
-        if (sa) {
-          if (nextCount) {
-            _clearNext();
-          }
-          counter.auto = true;
-          _doCount();
+        // TODO: verify that this doesn't break anything
+        // if (setAutoIncrement) {
+        if (setAutoIncrement && nextCount) {
+          _clearNext();
         }
+        counter.auto = true;
+        _doCount();
+        // }
       }
+
       return this;
     }
 
@@ -134,7 +170,9 @@
      * Sets the stop of the counter.
      *
      * @param {int} n
+     *   the value the counter should stop at
      *
+     * @return {object} instance of the counter
      */
     function setStop(n) {
       counter.stop = _isNumber(n) ? n : defaults.stop;
@@ -143,9 +181,14 @@
 
     /**
      * Increments counter by one animation based on set 'inc' value.
+     *
+     * @return {object} instance of the counter
      */
     function step() {
-      if (!counter.auto) _doCount();
+      if (!counter.auto) {
+        _doCount();
+      }
+
       return this;
     }
 
@@ -154,6 +197,8 @@
      *
      * @param {int} n
      *   Number to add to counter value
+     *
+     * @return {object} instance of the counter
      */
     function add(n) {
       if (_isNumber(n)) {
@@ -170,12 +215,14 @@
      *
      * @param {int} n
      *   Number to subtract from counter value
+     *
+     * @return {object} instance of the counter
      */
     function subtract(n) {
       if (_isNumber(n)) {
         x = counter.value;
         counter.value -= n;
-        if (counter.value >= 0){
+        if (counter.value >= 0) {
           y = counter.value;
         } else {
           y = '0';
@@ -183,11 +230,14 @@
         }
         _digitCheck(x, y);
       }
+
       return this;
     }
 
     /**
      * Gets current value of counter.
+     *
+     * @return {int} the current value of the counter
      */
     function getValue() {
       return counter.value;
@@ -195,9 +245,14 @@
 
     /**
      * Stops all running increments.
+     *
+     * @return {object} instance of the counter
      */
     function stop() {
-      if (nextCount) _clearNext();
+      if (nextCount) {
+        _clearNext();
+      }
+
       return this;
     }
 
@@ -215,25 +270,31 @@
       stop: stop
     };
 
-    /*---------------------------------------------------------------------------*/
-    /**
-     * Private methods
-     */
+    // ---------------------------------------------------------------------------
+    // Private methods
 
+    /**
+     * This is the function that does the "work" of the counter
+     *
+     * @param {boolean} first
+     *   this will be true if it's the first time the function is called
+     * @private
+     */
     function _doCount(first) {
-      var first_run = typeof(first) === 'undefined' ? false : first;
-      var remaining = counter.stop - counter.value;
+      var firstRun = typeof first === 'undefined' ? false : first;
+      // var remaining = counter.stop - counter.value;
 
       x = counter.value.toFixed(counter.decimals);
 
-      if (!first_run) {
-        if (remaining > 1000) {
-          counter.value += 1000;
-        } else if (remaining > 500) {
-          counter.value += 100;
-        } else {
-          counter.value += counter.inc;
-        }
+      if (!firstRun) {
+        // if (remaining > 1000) {
+        //   counter.value += 1000;
+        // } else if (remaining > 500) {
+        // if (remaining > 500) {
+        //   counter.value += 100;
+        // } else {
+        counter.value += counter.inc;
+        // }
       }
 
       y = counter.value.toFixed(counter.decimals);
@@ -251,6 +312,11 @@
       }
     }
 
+    /**
+     * Sets styled markup for the counter without any animation
+     *
+     * @private
+     */
     function _renderSimplifiedCounter() {
       // TODO: this needs work
       var counterValue = counter.stop ? counter.stop.toString() : counter.value.toString();
@@ -267,6 +333,15 @@
       elementContainer.innerHTML = digitMarkup;
     }
 
+    /**
+     * Checks for decimal places in the numbers to be rendered to the counter and calls the method to draw it
+     *
+     * @param {int} x
+     *   the number behind the current counter tile
+     * @param {int} y
+     *   the number of the current counter tile
+     * @private
+     */
     function _digitCheck(x, y) {
       if (counter.decimals) {
         x = x.toString().split('.');
@@ -293,17 +368,24 @@
       digitsAnimate = [];
       for (var i = 0; i < ylen; i++) {
         if (i < dlen) {
-          digitsAnimate[i] = decimalsNew[i] != decimalsOld[i];
+          digitsAnimate[i] = decimalsNew[i] !== decimalsOld[i];
         } else {
           var j = i - dlen;
-          digitsAnimate[i] = digitsNew[j] != digitsOld[j];
+          digitsAnimate[i] = digitsNew[j] !== digitsOld[j];
         }
       }
 
       _drawCounter();
     }
 
-    // creates array of digits for easier manipulation
+    /**
+     * Creates array of digits for easier manipulation
+     *
+     * @param {int} input
+     *   the number displayed across the whole counter; 750000, etc
+     * @return {array} digits
+     * @private
+     */
     function _toArray(input) {
       var fixedDigitInput = input;
       for (var i = input.length; i < 6; i += 1) {
@@ -319,14 +401,17 @@
       return output;
     }
 
-    // sets the correct digits on load
+    /**
+     * Creates and renders the counter markup to the supplied counter container element
+     * @private
+     */
     function _drawCounter() {
       var bit = 1;
       var html = '';
       var dNew;
       var dOld;
-
       var i = 0;
+
       if (counter.decimals) {
         for (i = 0; i < counter.decimals; i++) {
           dNew = _isNumber(decimalsNew[i]) ? decimalsNew[i] : '';
@@ -335,9 +420,9 @@
         }
 
         if (counter.hasOwnProperty('hideDigitDelimiters') && counter.hideDigitDelimiters === true) {
-          html += '';
+          html = String(html);
         } else {
-          html += '<li class="digit-delimiter">.</li>'
+          html += '<li class="digit-delimiter">.</li>';
         }
       }
 
@@ -349,11 +434,9 @@
         html += _counterDigitTemplate(i, dNew, dOld);
 
         if (counter.hasOwnProperty('hideDigitDelimiters') && counter.hideDigitDelimiters === true) {
-          html += '';
-        } else {
-          if (bit !== count && bit % 3 === 0) {
-            html += '<li class="digit-delimiter">,</li>';
-          }
+          html = String(html);
+        } else if (bit !== count && bit % 3 === 0) {
+          html += '<li class="digit-delimiter">,</li>';
         }
 
         bit++;
@@ -373,12 +456,25 @@
         for (var i = 0; i < animateDigitLength; i++) {
           if (digitsAnimate[i]) {
             var a = doc.getElementById(elementContainer.id + '-digit-a' + i);
-            a.className = a.className+' animate';
+            a.className += ' animate';
           }
         }
       }, 20);
     }
 
+    /**
+     * The template for generating a digit
+     *
+     * @param {int} index
+     *   the index of the digit in the counter
+     * @param {string} newDigit
+     *   the current number of the counter
+     * @param {string} oldDigit
+     *   the number behind the current number in the counter
+     * @return {string}
+     *   the markup needed to render a digit
+     * @private
+     */
     function _counterDigitTemplate(index, newDigit, oldDigit) {
       return '<li class="digit" id="' + elementContainer.id + '-digit-a' + index + '">' +
         '<div class="line"></div>' +
@@ -391,27 +487,80 @@
         '</li>';
     }
 
-    function _isNumber(n) {
-      return !isNaN(parseFloat(n)) && isFinite(n);
+    /**
+     * Self explanatory
+     *
+     * @param {int} num
+     *   number to check on
+     * @return {boolean}
+     *   seriously jsdoc?
+     * @private
+     */
+    function _isNumber(num) {
+      return !isNaN(parseFloat(num)) && isFinite(num);
     }
 
+    /**
+     * Removes the setTimeout instance of the ID assigned to nextCount
+     *
+     * @private
+     */
     function _clearNext() {
       clearTimeout(nextCount);
       nextCount = null;
     }
 
+    /**
+     * An easing function using a constant incremental growth
+     *
+     * @param {int} duration
+     *   duration of the animation process
+     * @param {int} range
+     *   range the of the numbers to animate
+     * @param {int} current
+     *   the current number of the counter
+     * @return {number}
+     *   the interval used for the setTimeout call on the animation delay
+     * @private
+     */
     function _constant(duration, range) {
       return duration / range;
     }
 
-    function _linear (duration, range, current) {
+    /**
+     * An easing function using a linear incremental growth
+     *
+     * @param {int} duration
+     *   duration of the animation process
+     * @param {int} range
+     *   range the of the numbers to animate
+     * @param {int} current
+     *   the current number of the counter
+     * @return {number}
+     *   the interval used for the setTimeout call on the animation delay
+     * @private
+     */
+    function _linear(duration, range, current) {
       return ((duration * 2) / Math.pow(range, 2)) * current;
     }
 
-    function _quadratic (duration, range, current) {
+    /**
+     * An easing function using a quadratic incremental growth
+     *
+     * @param {int} duration
+     *   duration of the animation process
+     * @param {int} range
+     *   range the of the numbers to animate
+     * @param {int} current
+     *   the current number of the counter
+     * @return {number}
+     *   the interval used for the setTimeout call on the animation delay
+     * @private
+     */
+    function _quadratic(duration, range, current) {
       return ((duration * 3) / Math.pow(range, 3)) * Math.pow(current, 2);
     }
   };
 
-  root.CounterModule = CounterModule(root.document);
+  root.counterModule = counterModule(root.document);
 }).call(this);
