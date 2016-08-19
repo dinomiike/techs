@@ -1,24 +1,24 @@
 (function() {
   'use strict';
 
-  const root = this;
+  var root = this;
 
-  let counterModule = function(doc) {
-    let counter;
-    let elementContainer;
-    let digitsOld = [];
-    let digitsNew = [];
-    let decimalsOld = [];
-    let decimalsNew = [];
-    let digitsAnimate = [];
-    let x;
-    let y;
-    let lastTimeout;
-    let nextCount = null;
-    const htmlElement = doc.getElementsByTagName('html')[0];
-    const cssAnimationSupport = htmlElement.className.indexOf('no-csstransforms3d') < 0;
+  function counterModule(doc) {
+    var counter;
+    var elementContainer;
+    var digitsOld = [];
+    var digitsNew = [];
+    var decimalsOld = [];
+    var decimalsNew = [];
+    var digitsAnimate = [];
+    var x;
+    var y;
+    var lastTimeout;
+    var nextCount = null;
+    var htmlElement = doc.getElementsByTagName('html')[0];
+    var cssAnimationSupport = htmlElement.className.indexOf('no-csstransforms3d') < 0;
 
-    let defaults = {
+    var defaults = {
       value: 0,
       inc: 1,
       pace: 1000,
@@ -38,19 +38,21 @@
         _clearNext();
       }
 
-      var range = counter.stop - counter.value;
-      var current = counter.value;
-      var duration = counter.duration;
-      var easingLookup = {
-        linear: _linear,
-        constant: _constant,
-        quadratic: _quadratic
-      };
-      var interval = counter.hasOwnProperty('easing') ? easingLookup[counter.easing] : counter.pace;
+      var interval = 0;
 
-      return setTimeout(_doCount, typeof interval === 'function' ? interval(duration, range, current) : interval);
-      // return setTimeout(_doCount, _quadratic(duration, range, current));
-      // return setTimeout(_doCount, 2000);
+      // All versions of IE that support css animations have strange race conditions with setTimeout and css transition
+      // delays. If this client is using IE, use a constant time interval for the counter.
+      if (counter.ieVersion === 0) {
+        var range = counter.stop - counter.value;
+        var duration = counter.duration;
+        var easing = BezierEasing(0.21, 0.08, 0.95, 0.41);
+        var iteration = 50 - (range);
+        interval = (easing((iteration + 1) / 50) - easing(iteration / 50)) * duration;
+      } else {
+        interval = 800;
+      }
+
+      return setTimeout(_doCount, interval);
     }
 
     /**
@@ -69,6 +71,8 @@
           counter[option] = counter.hasOwnProperty(option) ? counter[option] : defaults[option];
         }
       }
+
+      counter.ieVersion = _getIEVersion();
 
       if (typeof elementContainerId === 'string') {
         elementContainer = doc.getElementById(elementContainerId);
@@ -142,8 +146,6 @@
      * @return {object} instance of the counter
      */
     function setAuto(a) {
-      // TOOD: verify this doesn't break anything
-      // var setAutoIncrement = typeof a !== 'boolean' ? true : a;
       var setAutoIncrement = typeof a === 'boolean' ? a : true;
       if (counter.auto) {
         if (!setAutoIncrement) {
@@ -153,14 +155,11 @@
           counter.auto = false;
         }
       } else {
-        // TODO: verify that this doesn't break anything
-        // if (setAutoIncrement) {
         if (setAutoIncrement && nextCount) {
           _clearNext();
         }
         counter.auto = true;
         _doCount();
-        // }
       }
 
       return this;
@@ -287,14 +286,7 @@
       x = counter.value.toFixed(counter.decimals);
 
       if (!firstRun) {
-        // if (remaining > 1000) {
-        //   counter.value += 1000;
-        // } else if (remaining > 500) {
-        // if (remaining > 500) {
-        //   counter.value += 100;
-        // } else {
         counter.value += counter.inc;
-        // }
       }
 
       y = counter.value.toFixed(counter.decimals);
@@ -303,7 +295,6 @@
 
       // do first animation
       if (counter.auto === true) {
-        // nextCount = setTimeout(_doCount, counter.pace);
         nextCount = animateValue();
       }
       // stop counter
@@ -327,7 +318,7 @@
       var digitMarkup = '';
 
       for (var i = fixedDigitInput.length - 1; i > -1; i -= 1) {
-        digitMarkup += _counterDigitTemplate(i, fixedDigitInput[i], fixedDigitInput[i]);
+        digitMarkup += _counterDigitTemplate(i, fixedDigitInput[i], fixedDigitInput[i], 'simple');
       }
 
       elementContainer.innerHTML = digitMarkup;
@@ -391,14 +382,7 @@
       for (var i = input.length; i < 6; i += 1) {
         fixedDigitInput = '0' + fixedDigitInput;
       }
-      var output = fixedDigitInput.toString().split('').reverse();
-      // var output = input.toString().split('').reverse();
-      // if (counter.places > 0 && output.length < counter.places) {
-      //   for (var i = output.length; i < counter.places; i++) {
-      //     output.push('0');
-      //   }
-      // }
-      return output;
+      return fixedDigitInput.toString().split('').reverse();
     }
 
     /**
@@ -471,20 +455,25 @@
      *   the current number of the counter
      * @param {string} oldDigit
      *   the number behind the current number in the counter
+     * @param {string} style
+     *   pass 'simple' when rendering the non-animated version
      * @return {string}
      *   the markup needed to render a digit
      * @private
      */
-    function _counterDigitTemplate(index, newDigit, oldDigit) {
-      return '<li class="digit" id="' + elementContainer.id + '-digit-a' + index + '">' +
+    function _counterDigitTemplate(index, newDigit, oldDigit, style) {
+      var result = '<li class="digit" id="' + elementContainer.id + '-digit-a' + index + '">' +
         '<div class="line"></div>' +
         '<span class="front">' + newDigit + '</span>' +
-        '<span class="back">' + oldDigit + '</span>' +
-        '<div class="hinge-wrap"><div class="hinge">' +
-        '<span class="front">' + oldDigit + '</span>' +
-        '<span class="back">' + newDigit + '</span>' +
-        '</div></div>' +
-        '</li>';
+        '<span class="back">' + oldDigit + '</span>';
+      if (style !== 'simple') {
+        result += '<div class="hinge-wrap"><div class="hinge">' +
+          '<span class="front">' + oldDigit + '</span>' +
+          '<span class="back">' + newDigit + '</span>' +
+          '</div></div>' +
+          '</li>';
+      }
+      return result;
     }
 
     /**
@@ -511,56 +500,26 @@
     }
 
     /**
-     * An easing function using a constant incremental growth
-     *
-     * @param {int} duration
-     *   duration of the animation process
-     * @param {int} range
-     *   range the of the numbers to animate
-     * @param {int} current
-     *   the current number of the counter
-     * @return {number}
-     *   the interval used for the setTimeout call on the animation delay
-     * @private
+     * Test for Internet Explorer and version
+     * @returns {int} IE version or 0 for not IE
      */
-    function _constant(duration, range) {
-      return duration / range;
+    function _getIEVersion() {
+      var userAgent = window.navigator.userAgent;
+      var index = userAgent.indexOf('MSIE');
+      var version = 0;
+
+      if (index > 0) {
+        version = parseInt(userAgent.substring(index + 5, userAgent.indexOf('.', index)));
+      } else if (!!navigator.userAgent.match(/Trident\/7\./)) {
+        version = 11;
+      } else {
+        version = 0;
+      }
+
+      return version;
     }
 
-    /**
-     * An easing function using a linear incremental growth
-     *
-     * @param {int} duration
-     *   duration of the animation process
-     * @param {int} range
-     *   range the of the numbers to animate
-     * @param {int} current
-     *   the current number of the counter
-     * @return {number}
-     *   the interval used for the setTimeout call on the animation delay
-     * @private
-     */
-    function _linear(duration, range, current) {
-      return ((duration * 2) / Math.pow(range, 2)) * current;
-    }
-
-    /**
-     * An easing function using a quadratic incremental growth
-     *
-     * @param {int} duration
-     *   duration of the animation process
-     * @param {int} range
-     *   range the of the numbers to animate
-     * @param {int} current
-     *   the current number of the counter
-     * @return {number}
-     *   the interval used for the setTimeout call on the animation delay
-     * @private
-     */
-    function _quadratic(duration, range, current) {
-      return ((duration * 3) / Math.pow(range, 3)) * Math.pow(current, 2);
-    }
-  };
+  }
 
   root.counterModule = counterModule(root.document);
 }).call(this);

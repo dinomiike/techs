@@ -32,20 +32,30 @@
     <!-- Color the status bar on mobile devices -->
     <meta name="theme-color" content="#2F3BA2">
 
-    <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
-    <!--
-    <link rel="canonical" href="http://www.example.com/">
-    -->
     <link rel="stylesheet" href="styles/counter-module.css">
     <link rel="stylesheet" href="styles/counter-module-demo.css">
   </head>
-  <body>
+  <body style="background: bisque;">
     <h1>Counter Module</h1>
-    <div class="clearfix">
+    <div class="clearfix" style="height: 217px;">
       <div class="counter-wrapper">
         <ul class="counter-module default" id="counterModule"></ul>
       </div>
     </div>
+
+    <div class="clearfix" style="height: 217px;">
+      <div class="counter-wrapper">
+        <ul class="counter-module default" id="counterModule2"></ul>
+      </div>
+    </div>
+
+    <div class="clearfix" style="height: 217px;">
+      <div class="counter-wrapper">
+        <ul class="counter-module default" id="counterModule3"></ul>
+      </div>
+    </div>
+
+    <div id="agent"></div>
 
     <div class="demo-buttons">
       <button id="default" data-style="default">default</button>
@@ -53,20 +63,35 @@
       <button id="small" data-style="small">small</button>
     </div>
 
+    <script src="scripts/vendor/bezier-easing.js"></script>
     <script src="scripts/counter-module.js"></script>
     <script>
       (function() {
         window.counter = counterModule;
         counter.init('counterModule', {
-          value: 500,
-          stop: 510,
+          value: (15000 - 50),
+          stop: 15000,
           inc: 1,
           auto: true,
-          pace: 1000,
-          duration: 5000,
-//          easing: 'linear',
+          pace: 30000,
+          duration: 15000,
+          easing: 'custom',
           hideDigitDelimiters: true
         });
+
+        window.counter = counterModule;
+        counter.init('counterModule2', {
+          value: (15000 - 50),
+          inc: 1,
+          auto: true,
+          pace: 30000,
+          duration: 15000,
+          easing: 'custom',
+          hideDigitDelimiters: true
+        });
+
+        var agent = document.getElementById('agent');
+        agent.innerHTML = window.navigator.userAgent;
 
         var defaultButton = document.getElementById('default');
         var mobileButton = document.getElementById('mobile');

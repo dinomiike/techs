@@ -9,7 +9,7 @@ body {
   height: 100%;
   margin: 0;
   font-family: $font-stack;
-  background: -webkit-linear-gradient(-45deg, #c5d4d7 6%, #d6b98d 34%, #c99262 57%, #8c5962 80%, #43577e 100%);
+  //background: -webkit-linear-gradient(-45deg, #c5d4d7 6%, #d6b98d 34%, #c99262 57%, #8c5962 80%, #43577e 100%);
 }
 
 h1 {
@@ -21,6 +21,11 @@ h1 {
   font-size: 48px;
   //color: #4d4d4d;
   color: #ffffff;
+}
+
+#agent {
+  text-align: center;
+  color: #1a1a1a;
 }
 
 @media (min-width: 768px) {

@@ -250,20 +250,22 @@ gulp.task('generate-service-worker', ['copy-sw-scripts'], () => {
 });
 
 gulp.task('counter', () =>
-  gulp.src([
-    './app/scripts/counter-module.js'
-  ])
-    .pipe($.newer('.tmp/scripts'))
-    .pipe($.sourcemaps.init())
-    .pipe($.babel())
-    .pipe($.sourcemaps.write())
-    .pipe(gulp.dest('.tmp/scripts'))
-    .pipe($.concat('counter-module.min.js'))
-    .pipe($.uglify({preserveComments: 'some'}))
-    // Output files
-    .pipe($.size({title: 'scripts'}))
-    .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest('dist/scripts'))
+  // gulp.src([
+  //   './app/scripts/counter-module.js'
+  // ])
+  //   .pipe($.babel())
+  //   .pipe(gulp.dest('.tmp/scripts'))
+  //   .pipe($.concat('counter-module.min.js'))
+  //   .pipe($.uglify({preserveComments: 'some'}).on('error', $.uglify.logError))
+  //   // Output files
+  //   .pipe($.size({title: 'scripts'}))
+  //   .pipe($.sourcemaps.write('.'))
+  //   .pipe(gulp.dest('dist/scripts'))
+  gulp.src('./app/scripts/counter-module.js')
+    .pipe($.babel({
+      presets: ['es2015']
+    }))
+    .pipe(gulp.dest('./dist/scripts'))
 );
 
 // Load custom tasks from the `tasks` directory

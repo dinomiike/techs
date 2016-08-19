@@ -1,20 +1,39 @@
 $font-stack: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$upper-tile: #fff;
+$upper-tile: #ffffff;
 $lower-tile: #efefef;
 $tile-color: #545454;
 $line-color: rgba(220, 220, 220, 0.7);
+
+@mixin desktop {
+  @media (min-width: 992px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 768px) {
+    @content;
+  }
+}
 
 .counter-wrapper {
   float: right;
   position: relative;
   left: -50%;
+  height: 90px;
   margin-top: 20px;
-  padding-top: 190px;
-}
 
-@media (min-width: 768px) {
-  .counter-wrapper {
-    padding-top: 0;
+  @include tablet {
+    height: 90px;
+  }
+
+  @include desktop {
+    height: 177px;
+  }
+
+  &.header {
+    height: 50px;
+    margin-top: 15px;
   }
 }
 
@@ -33,11 +52,23 @@ $line-color: rgba(220, 220, 220, 0.7);
   .digit {
     position: relative;
     z-index: 0;
-    width: 125px;
-    height: 176px;
-    margin-left: 2px;
+    width: 50px;
+    height: 90px;
+    margin-left: 1px;
     text-align: center;
     line-height: 0;
+
+    @include tablet {
+      width: 70px;//50px;
+      height: 110px;//90px;
+      margin-left: 1px;
+    }
+
+    @include desktop {
+      width: 125px;
+      height: 176px;
+      margin-left: 2px;
+    }
 
     &:last-child {
       margin-left: 0;
@@ -49,15 +80,19 @@ $line-color: rgba(220, 220, 220, 0.7);
       -ms-transform: rotateX(-180deg);
       -o-transform: rotateX(-180deg);
       transform: rotateX(-180deg);
+
+      span.back {
+        backface-visibility: visible;
+      }
     }
 
     span {
       position: absolute;
       left: 0;
-      width: 125px;
-      height: 88px;
+      width: 50px;
+      height: 45px;
       overflow: hidden;
-      font-size: 140px;
+      font-size: 68px;
       font-family: $font-stack;
       font-weight: 100;
       text-indent: 2px;
@@ -68,130 +103,29 @@ $line-color: rgba(220, 220, 220, 0.7);
       -o-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
 
-      &.front {
-        top: 0;
-        padding-top: 88px;
+      @include tablet {
+        width: 70px;//50px;
+        height: 55px;//45px;
+        font-size: 78px;//68px;
       }
 
-      &.back {
-        bottom: 0;
-        background-color: $lower-tile;
-      }
-    }
-
-    .line {
-      position: absolute;
-      z-index: 10;
-      width: 125px;
-      height: 88px;
-      border-bottom: 1px solid $line-color;
-    }
-
-    .hinge-wrap {
-      z-index: 5;
-      position: relative;
-      overflow: visible;
-      -webkit-perspective: 300px;
-      -moz-perspective: 300px;
-      -ms-perspective: 300px;
-      perspective: 300px;
-    }
-
-    .hinge {
-      position: absolute;
-      width: 125px;
-      height: 88px;
-      -webkit-transform-style: preserve-3d;
-      -moz-transform-style: preserve-3d;
-      -ms-transform-style: preserve-3d;
-      transform-style: preserve-3d;
-      -webkit-transition: -webkit-transform 0.3s ease-in;
-      -moz-transition: -moz-transform 0.3s ease-in;
-      transition: transform 0.3s ease-in;
-      -webkit-transform-origin: 50% 100%;
-      -moz-transform-origin: 50% 100%;
-      -ms-transform-origin: 50% 100%;
-      -o-transform-origin: 50% 100%;
-      transform-origin: 50% 100%;
-
-      span {
-        height: 0;
-        z-index: 5;
-        -webkit-backface-visibility: hidden;
-        -moz-backface-visibility: hidden;
-        -ms-backface-visibility: hidden;
-        backface-visibility: hidden;
-      }
-
-      span.front {
-        padding-top: 88px;
-      }
-
-      span.back {
+      @include desktop {
+        width: 125px;
         height: 88px;
-        -webkit-transform: rotateX(180deg);
-        -moz-transform: rotateX(180deg);
-        -ms-transform: rotateX(180deg);
-        -o-transform: rotateX(180deg);
-        transform: rotateX(180deg);
+        font-size: 140px;
       }
-    }
-  }
-
-  .digit-delimiter {
-    padding-top: 38px;
-    margin-right: -5px;
-    font-family: $font-stack;
-    font-weight: 700;
-    font-size: 52px;
-    color: $tile-color;
-    text-indent: 3.33333333px;
-  }
-}
-
-.counter-module.small {
-  .digit {
-    position: relative;
-    z-index: 0;
-    width: 30px;
-    height: 40px;
-    margin-left: 1px;
-    text-align: center;
-    line-height: 0;
-
-    &:last-child {
-      margin-left: 0;
-    }
-
-    &.animate .hinge {
-      -webkit-transform: rotateX(-180deg);
-      -moz-transform: rotateX(-180deg);
-      -ms-transform: rotateX(-180deg);
-      -o-transform: rotateX(-180deg);
-      transform: rotateX(-180deg);
-    }
-
-    span {
-      position: absolute;
-      left: 0;
-      height: 20px;
-      width: 30px;
-      overflow: hidden;
-      font-size: 34px;
-      font-family: $font-stack;
-      font-weight: 100;
-      text-indent: 2px;
-      color: $tile-color;
-      -webkit-transform: translate3d(0, 0, 0);
-      -moz-transform: translate3d(0, 0, 0);
-      -o-transform: translate3d(0, 0, 0);
-      transform: translate3d(0, 0, 0);
 
       &.front {
         top: 0;
-        padding-top: 20px;
-        background-color: $upper-tile;
-        color: $tile-color;
+        padding-top: 45px;
+
+        @include tablet {
+          padding-top: 55px;//45px;
+        }
+
+        @include desktop {
+          padding-top: 88px;
+        }
       }
 
       &.back {
@@ -203,9 +137,19 @@ $line-color: rgba(220, 220, 220, 0.7);
     .line {
       position: absolute;
       z-index: 10;
-      height: 20px;
-      width: 30px;
+      width: 50px;
+      height: 45px;
       border-bottom: 1px solid $line-color;
+
+      @include tablet {
+        width: 70px;//50px;
+        height: 55px;//45px;
+      }
+
+      @include desktop {
+        width: 125px;
+        height: 88px;
+      }
     }
 
     .hinge-wrap {
@@ -220,8 +164,8 @@ $line-color: rgba(220, 220, 220, 0.7);
 
     .hinge {
       position: absolute;
-      height: 20px;
-      width: 30px;
+      width: 50px;
+      height: 45px;
       -webkit-transform-style: preserve-3d;
       -moz-transform-style: preserve-3d;
       -ms-transform-style: preserve-3d;
@@ -235,6 +179,16 @@ $line-color: rgba(220, 220, 220, 0.7);
       -o-transform-origin: 50% 100%;
       transform-origin: 50% 100%;
 
+      @include tablet {
+        width: 70px;//50px;
+        height: 55px;//45px;
+      }
+
+      @include desktop {
+        width: 125px;
+        height: 88px;
+      }
+
       span {
         height: 0;
         z-index: 5;
@@ -245,16 +199,33 @@ $line-color: rgba(220, 220, 220, 0.7);
       }
 
       span.front {
-        padding-top: 20px;
+        padding-top: 45px;
+
+        @include tablet {
+          padding-top: 55px;//45px;
+        }
+
+        @include desktop {
+          padding-top: 88px;
+        }
       }
 
       span.back {
-        height: 20px;
+        height: 45px;
         -webkit-transform: rotateX(180deg);
         -moz-transform: rotateX(180deg);
         -ms-transform: rotateX(180deg);
         -o-transform: rotateX(180deg);
         transform: rotateX(180deg);
+        //transition: backface-visibility 0.15s ease-in 0s;
+
+        @include tablet {
+          height: 55px;//45px;
+        }
+
+        @include desktop {
+          height: 88px;
+        }
       }
     }
   }
@@ -267,15 +238,29 @@ $line-color: rgba(220, 220, 220, 0.7);
     font-size: 25px;
     color: $tile-color;
     text-indent: 1.66666667px;
+
+    @include tablet {
+      padding-top: 15px;
+      margin-right: -2.5px;
+      font-size: 25px;
+      text-indent: 1.66666667px;
+    }
+
+    @include desktop {
+      padding-top: 38px;
+      margin-right: -5px;
+      font-size: 52px;
+      text-indent: 3.33333333px;
+    }
   }
 }
 
-.counter-module.mobile {
+.counter-module.small {
   .digit {
     position: relative;
     z-index: 0;
-    width: 50px;
-    height: 90px;
+    width: 50px;//30px;
+    height: 60px;//40px;
     margin-left: 1px;
     text-align: center;
     line-height: 0;
@@ -289,20 +274,20 @@ $line-color: rgba(220, 220, 220, 0.7);
       -moz-transform: rotateX(-180deg);
       -ms-transform: rotateX(-180deg);
       -o-transform: rotateX(-180deg);
-      transform: rotateX(-180deg);
+      transform: perspective(200px) rotateX(-180deg);
     }
 
     span {
       position: absolute;
       left: 0;
-      height: 45px;
-      width: 50px;
+      width: 50px;//30px;
+      height: 30px;//20px;
       overflow: hidden;
-      font-size: 68px;
+      font-size: 52px;//34px;
       font-family: $font-stack;
       font-weight: 100;
       text-indent: 2px;
-      color: #545454;
+      color: $tile-color;
       -webkit-transform: translate3d(0, 0, 0);
       -moz-transform: translate3d(0, 0, 0);
       -o-transform: translate3d(0, 0, 0);
@@ -310,7 +295,7 @@ $line-color: rgba(220, 220, 220, 0.7);
 
       &.front {
         top: 0;
-        padding-top: 45px;
+        padding-top: 30px;//20px;
         background-color: $upper-tile;
         color: $tile-color;
       }
@@ -324,8 +309,8 @@ $line-color: rgba(220, 220, 220, 0.7);
     .line {
       position: absolute;
       z-index: 10;
-      height: 45px;
-      width: 50px;
+      width: 50px;//30px;
+      height: 30px;//20px;
       border-bottom: 1px solid $line-color;
     }
 
@@ -341,8 +326,8 @@ $line-color: rgba(220, 220, 220, 0.7);
 
     .hinge {
       position: absolute;
-      height: 45px;
-      width: 50px;
+      width: 50px;//30px;
+      height: 30px;//20px;
       -webkit-transform-style: preserve-3d;
       -moz-transform-style: preserve-3d;
       -ms-transform-style: preserve-3d;
@@ -366,11 +351,11 @@ $line-color: rgba(220, 220, 220, 0.7);
       }
 
       span.front {
-        padding-top: 45px;
+        padding-top: 30px;//20px;
       }
 
       span.back {
-        height: 45px;
+        height: 30px;//20px;
         -webkit-transform: rotateX(180deg);
         -moz-transform: rotateX(180deg);
         -ms-transform: rotateX(180deg);
