@@ -35,7 +35,7 @@
     <link rel="stylesheet" href="styles/counter-module.css">
     <link rel="stylesheet" href="styles/counter-module-demo.css">
   </head>
-  <body style="background: bisque;">
+  <body style="background: darkgray;">
     <h1>Counter Module</h1>
     <div class="clearfix" style="height: 217px;">
       <div class="counter-wrapper">
@@ -43,24 +43,12 @@
       </div>
     </div>
 
-    <div class="clearfix" style="height: 217px;">
-      <div class="counter-wrapper">
-        <ul class="counter-module default" id="counterModule2"></ul>
-      </div>
-    </div>
-
-    <div class="clearfix" style="height: 217px;">
-      <div class="counter-wrapper">
-        <ul class="counter-module default" id="counterModule3"></ul>
-      </div>
-    </div>
-
     <div id="agent"></div>
 
     <div class="demo-buttons">
-      <button id="default" data-style="default">default</button>
-      <button id="mobile" data-style="mobile">mobile</button>
-      <button id="small" data-style="small">small</button>
+      <button id="default" data-style="index">default</button>
+      <button id="constant" data-style="constant">constant</button>
+      <button id="fixed" data-style="fixed">fixed</button>
     </div>
 
     <script src="scripts/vendor/bezier-easing.js"></script>
@@ -79,38 +67,20 @@
           hideDigitDelimiters: true
         });
 
-        window.counter = counterModule;
-        counter.init('counterModule2', {
-          value: (15000 - 50),
-          inc: 1,
-          auto: true,
-          pace: 30000,
-          duration: 15000,
-          easing: 'custom',
-          hideDigitDelimiters: true
-        });
-
         var agent = document.getElementById('agent');
         agent.innerHTML = window.navigator.userAgent;
 
         var defaultButton = document.getElementById('default');
-        var mobileButton = document.getElementById('mobile');
-        var smallButton = document.getElementById('small');
+        var constantButton = document.getElementById('constant');
+        var fixedButton = document.getElementById('fixed');
 
         function buttonHandler() {
-          var counterElement = document.querySelector('.counter-module');
-          var cssClasses = counterElement.classList;
-          cssClasses.forEach(function(cssClass) {
-            if (cssClass !== 'counter-module') {
-              counterElement.classList.remove(cssClass);
-            }
-          });
-          counterElement.classList.add(this.getAttribute('data-style'));
+          window.location = this.getAttribute('data-style') + '.html';
         }
 
         defaultButton.addEventListener('click', buttonHandler, false);
-        mobileButton.addEventListener('click', buttonHandler, false);
-        smallButton.addEventListener('click', buttonHandler, false);
+        constantButton.addEventListener('click', buttonHandler, false);
+        fixedButton.addEventListener('click', buttonHandler, false);
       })();
     </script>
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->

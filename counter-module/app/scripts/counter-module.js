@@ -17,6 +17,7 @@
     var nextCount = null;
     var htmlElement = doc.getElementsByTagName('html')[0];
     var cssAnimationSupport = htmlElement.className.indexOf('no-csstransforms3d') < 0;
+    var CONSTANT_INTERVAL_TIME = 800;
 
     var defaults = {
       value: 0,
@@ -39,17 +40,18 @@
       }
 
       var interval = 0;
+      var useVariableRate = counter.hasOwnProperty('useConstantRate') === false || counter.useConstantRate === false;
 
       // All versions of IE that support css animations have strange race conditions with setTimeout and css transition
       // delays. If this client is using IE, use a constant time interval for the counter.
-      if (counter.ieVersion === 0) {
+      if (counter.ieVersion === 0 && useVariableRate === true) {
         var range = counter.stop - counter.value;
         var duration = counter.duration;
         var easing = BezierEasing(0.21, 0.08, 0.95, 0.41);
         var iteration = 50 - (range);
         interval = (easing((iteration + 1) / 50) - easing(iteration / 50)) * duration;
       } else {
-        interval = 800;
+        interval = CONSTANT_INTERVAL_TIME;
       }
 
       return setTimeout(_doCount, interval);
@@ -501,7 +503,7 @@
 
     /**
      * Test for Internet Explorer and version
-     * @returns {int} IE version or 0 for not IE
+     * @return {int} IE version or 0 for not IE
      */
     function _getIEVersion() {
       var userAgent = window.navigator.userAgent;
@@ -517,6 +519,15 @@
       }
 
       return version;
+    }
+
+    /**
+     * User agent sniffer, used to detect Android versions that won't support CSS animation properly
+     *
+     * @return {object}
+     */
+    function _sniff(userAgent) {
+      return false;
     }
 
   }
