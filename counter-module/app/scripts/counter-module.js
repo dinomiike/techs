@@ -15,9 +15,9 @@
     var y;
     var lastTimeout;
     var nextCount = null;
-    var htmlElement = doc.getElementsByTagName('html')[0];
-    var cssAnimationSupport = htmlElement.className.indexOf('no-csstransforms3d') < 0;
     var CONSTANT_INTERVAL_TIME = 800;
+    var VARIABLE_TIME_ANIMATION;
+    var CONSTANT_TIME_ANIMATION;
 
     var defaults = {
       value: 0,
@@ -34,6 +34,67 @@
      * @return {int} The setTimeout call returns an integer of the timeout id.
      */
     function animateValue() {
+      function getInterval() {
+        var useVariableRate = counter.hasOwnProperty('useConstantRate') === false || counter.useConstantRate === false;
+        var interval = 0;
+
+        function getVariableInterval() {
+          var range = counter.stop - counter.value;
+          var duration = counter.duration;
+          var easing = BezierEasing(0.21, 0.08, 0.95, 0.41);
+          var iteration = 50 - range;
+          var variableInterval = (easing((iteration + 1) / 50) - easing(iteration / 50)) * duration;
+
+          return variableInterval;
+        }
+
+        function getWindowsInterval(browser) {
+          var interval = 0;
+
+          if (browser.name === 'IE') {
+            // do ie things
+            interval = CONSTANT_INTERVAL_TIME;
+          } else {
+            interval = getVariableInterval();
+          }
+
+          return interval;
+        }
+
+        if (useVariableRate === true) {
+
+          switch (counter.client.os) {
+            case 'Windows':
+              // do windows things
+              interval = getWindowsInterval(counter.client.browser);
+              break;
+            case 'Android':
+              // do android things
+              interval = getAndroidInterval(counter.client.browser);
+              break;
+            default:
+              // do the full thing
+              interval = getVariableInterval();
+          }
+
+        } else {
+          interval = CONSTANT_INTERVAL_TIME;
+        }
+
+
+
+
+
+          then if parseInt(counter.clientBrowser.major) <= 11
+            return CONSTANT_INTERVAL_TIME;
+          else
+            return (calculatedTime);
+        else if counter.clientBrowser === 'Android'
+          then if
+
+        return interval;
+      }
+
       // stop counter
       if (counter.value === counter.stop) {
         _clearNext();
@@ -54,7 +115,7 @@
         interval = CONSTANT_INTERVAL_TIME;
       }
 
-      return setTimeout(_doCount, interval);
+      return setTimeout(_doCount, getInterval());
     }
 
     /**
@@ -68,19 +129,114 @@
     function init(elementContainerId, options) {
       counter = options || {};
 
+      var agentParser = new UAParser();
+      agentParser.getResult();
+      counter.client = {};
+      counter.client.browser = agentParser.getBrowser();
+      counter.client.os = agentParser.getOS();
+
+      var htmlElement = doc.getElementsByTagName('html')[0];
+      var cssAnimationSupport = htmlElement.className.indexOf('no-csstransforms3d') < 0;
+      var supportedBrowsers = [
+        'chrome',
+        'firefox',
+        'safari',
+        'mobile safari',
+        'ie',
+        'edge',
+        'opera'
+      ];
+      var supportedBrowser;
+      // variable/constant/static
+      var animationExperience;
+      var browserName = counter.client.browser.name;
+      var browserMajorVersion = parseInt(counter.client.browser.major);
+
+      // TODO: flip the else if conditional params on each case statement. harder to read that way
+      // ensure this is a supported browser
+      if (browserName && supportedBrowsers.indexOf(browserName.toLowerCase()) < -1) {
+        switch (browserName) {
+          case 'Chrome':
+            if (browserMajorVersion >= 49) {
+              supportedBrowser = true;
+              animationExperience = VARIABLE_TIME_ANIMATION;
+            } else if (browserMajorVersion < 49 || browserMajorVersion > 30) {
+              supportedBrowser = true;
+              animationExperience = CONSTANT_TIME_ANIMATION;
+            } else {
+              supportedBrowser = false;
+            }
+            break;
+
+          case 'Firefox':
+            if (browserMajorVersion >= 34) {
+              supportedBrowser = true;
+              animationExperience = CONSTANT_INTERVAL_TIME;
+            } else {
+              supportedBrowser = false;
+            }
+            break;
+
+          case 'Safari':
+            if (browserMajorVersion >= 6) {
+              supportedBrowser = true;
+              animationExperience = VARIABLE_TIME_ANIMATION;
+            } else {
+              supportedBrowser = true;
+              animationExperience = CONSTANT_INTERVAL_TIME;
+            }
+            break;
+
+          case 'Mobile Safari':
+            if (browserMajorVersion >= 7) {
+              supportedBrowser = true;
+              animationExperience = VARIABLE_TIME_ANIMATION;
+            } else if (browserMajorVersion < 7 || browserMajorVersion >= 5) {
+              supportedBrowser = true;
+              animationExperience = CONSTANT_INTERVAL_TIME;
+            } else {
+              supportedBrowser = false;
+            }
+
+          case 'IE':
+            if (browserMajorVersion >= 10) {
+              supportedBrowser = true;
+              animationExperience = CONSTANT_TIME_ANIMATION;
+            } else {
+              supportedBrowser = false;
+            }
+            break;
+
+          case 'Edge':
+            supportedBrowser = true;
+            animationExperience = CONSTANT_INTERVAL_TIME;
+            break;
+
+          case 'Opera':
+            if (browserMajorVersion >= 30) {
+              supportedBrowser = true;
+              animationExperience = VARIABLE_TIME_ANIMATION;
+            } else if (browserMajorVersion <= 20 || browserMajorVersion > 30) {
+              supportedBrowser = true;
+              animationExperience = CONSTANT_INTERVAL_TIME;
+            } else {
+              supportedBrowser = false;
+            }
+            break;
+        }
+      }
+
       for (var option in defaults) {
         if (defaults.hasOwnProperty(option)) {
           counter[option] = counter.hasOwnProperty(option) ? counter[option] : defaults[option];
         }
       }
 
-      counter.ieVersion = _getIEVersion();
-
       if (typeof elementContainerId === 'string') {
         elementContainer = doc.getElementById(elementContainerId);
       }
 
-      if (cssAnimationSupport) {
+      if (cssAnimationSupport && supportedBrowser) {
         if (counter.auto) {
           // start the counter
           _doCount(true);
@@ -505,21 +661,21 @@
      * Test for Internet Explorer and version
      * @return {int} IE version or 0 for not IE
      */
-    function _getIEVersion() {
-      var userAgent = window.navigator.userAgent;
-      var index = userAgent.indexOf('MSIE');
-      var version = 0;
-
-      if (index > 0) {
-        version = parseInt(userAgent.substring(index + 5, userAgent.indexOf('.', index)));
-      } else if (!!navigator.userAgent.match(/Trident\/7\./)) {
-        version = 11;
-      } else {
-        version = 0;
-      }
-
-      return version;
-    }
+    // function _getIEVersion() {
+    //   var userAgent = window.navigator.userAgent;
+    //   var index = userAgent.indexOf('MSIE');
+    //   var version = 0;
+    //
+    //   if (index > 0) {
+    //     version = parseInt(userAgent.substring(index + 5, userAgent.indexOf('.', index)));
+    //   } else if (!!navigator.userAgent.match(/Trident\/7\./)) {
+    //     version = 11;
+    //   } else {
+    //     version = 0;
+    //   }
+    //
+    //   return version;
+    // }
 
     /**
      * User agent sniffer, used to detect Android versions that won't support CSS animation properly
