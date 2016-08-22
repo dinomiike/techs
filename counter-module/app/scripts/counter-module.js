@@ -24,8 +24,6 @@
     var nextCount = null;
     var animationExperience;
     var CONSTANT_INTERVAL_TIME = 800;
-    var VARIABLE_TIME_ANIMATION;
-    var CONSTANT_TIME_ANIMATION;
     var ANIMATION_RATE = {
       VARIABLE: 'variable',
       CONSTANT: 'constant'
@@ -81,13 +79,6 @@
       agentParser.getResult();
       counter.client = {};
       counter.client.browser = agentParser.getBrowser();
-
-      // TODO: REMOVE THIS
-      var browserElement = document.getElementById('browser');
-      browserElement.innerHTML = counter.client.browser.name;
-      var versionElement = document.getElementById('version');
-      versionElement.innerHTML = counter.client.browser.major;
-      // TODO: REMOVE THIS
 
       var htmlElement = doc.getElementsByTagName('html')[0];
       var cssAnimationSupport = htmlElement.className.indexOf('no-csstransforms3d') < 0;
